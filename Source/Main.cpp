@@ -25,10 +25,20 @@ int main(int ArgumentCount, char* pArgv[])
 	Application.setOrganizationName("TU Delft");
 	Application.setApplicationName("Exposure Render");
 	
-	// Application settings
-	QSettings Settings;
+	{
+		QSettings Settings;
 
-	Settings.setValue("version", "1.0.0");
+		Settings.setValue("version", "1.1.0");
+		Settings.setValue("startup/dialog/show", QVariant(false));
+		QStringList args = QCoreApplication::arguments();
+		if (args.length() > 1) {
+			QString dataShareFolder = args.at(1);
+			Settings.setValue("startup/preset/folder", QVariant(dataShareFolder));
+		} else {
+			Settings.setValue("startup/preset/folder", QVariant(QApplication::applicationDirPath()));
+		}
+		QString settingsfile = Settings.fileName();
+	}
 
 	// Main window
 	CMainWindow MainWindow;
@@ -41,19 +51,19 @@ int main(int ArgumentCount, char* pArgv[])
 
 	MainWindow.setWindowIcon(GetIcon("grid"));
 
-	
-
 	// Load default presets
-	gStatus.SetLoadPreset("Default");
+	// gStatus.SetLoadPreset("Default");
 
-//	Log("Device memory: " + QString::number(GetUsedCudaMemory() / MB, 'f', 2) + "/" + QString::number(GetTotalCudaMemory() / MB, 'f', 2) + " MB", "memory");
+	//	Log("Device memory: " + QString::number(GetUsedCudaMemory() / MB, 'f', 2) + "/" + QString::number(GetTotalCudaMemory() / MB, 'f', 2) + " MB", "memory");
 
 	// Override the application setting to enforce the display of the startup dialog
-	Settings.setValue("startup/dialog/show", QVariant(true));
-
+	// Application settings
+	
+	QSettings Settings;
 	// Show startup dialog
 	if (Settings.value("startup/dialog/show").toBool() == true)
 		MainWindow.ShowStartupDialog();
+
 
 	// Execute the application
 	int Result = Application.exec();

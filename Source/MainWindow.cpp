@@ -20,7 +20,7 @@
 #include "AboutDialog.h"
 #include "Scene.h"
 
-QUrl	gVersionInfoUrl("http://exposure-render.googlecode.com/hg/VersionInfo.xml");
+QUrl	gVersionInfoUrl("https://raw.githubusercontent.com/ThomasKroes/exposure-render.release110/master/VersionInfo.xml");
 int		gVersionID = 303;
 
 // Main window singleton
@@ -62,6 +62,13 @@ CMainWindow::CMainWindow() :
 	QObject::connect(&m_HttpGet, SIGNAL(done()), this, SLOT(VersionInfoDownloaded()));
 
 	OnCheckForUpdates();
+	
+	QStringList args = QCoreApplication::arguments();
+	if (args.length() > 1) {
+		QString dataShareFolder = args.at(1);
+		QString FileName = QDir::cleanPath(dataShareFolder + QDir::separator() + "volume.mhd");
+		Open(FileName);
+	}
 }
 
 CMainWindow::~CMainWindow(void)
@@ -324,7 +331,7 @@ void CMainWindow::ShowStartupDialog(void)
 
 void CMainWindow::OnVisitWebsite(void)
 {
-	QDesktopServices::openUrl(QUrl("http://code.google.com/p/exposure-render/"));
+	QDesktopServices::openUrl(QUrl("https://github.com/AlexanderKoehn/exposure-render.release110"));
 }
 
 void CMainWindow::OnSaveImage(void)
