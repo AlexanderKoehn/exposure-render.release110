@@ -416,7 +416,7 @@ bool QRenderThread::Load(QString& FileName)
 
 	// Compute the volume's bounding box
 	gScene.m_BoundingBox.m_MinP	= Vec3f(0.0f);
-	gScene.m_BoundingBox.m_MaxP	= PhysicalSize / PhysicalSize.Max();
+	gScene.m_BoundingBox.m_MaxP	= PhysicalSize;// / PhysicalSize.Max();
 
 	gScene.m_GradientDelta = 1.0f / (float)gScene.m_Resolution.GetMax();
 	
