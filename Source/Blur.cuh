@@ -16,7 +16,9 @@
 #include "Geometry.h"
 #include "Scene.h"
 #include "CudaUtilities.h"
-#include "cutil_math.h"
+// Since CUDA 7.5 there is no cutil.math
+// #include "cutil_math.h"
+#include "helper_math.h"
 
 #define KRNL_BLUR_BLOCK_W		16
 #define KRNL_BLUR_BLOCK_H		8

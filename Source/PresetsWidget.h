@@ -62,7 +62,6 @@ protected:
 	QPushButton		m_RemovePreset;
 	QPushButton		m_LoadPresets;
 	QPushButton		m_SavePresets;
-	QPresetList		m_PresetItems;
 };
 
 template <class T>
@@ -90,11 +89,8 @@ public:
 
 		for (int i = 0; i < m_Presets.size(); i++)
 		{
-			// Put pointer to preset in void pointer of variant
-			QVariant Variant = qVariantFromValue((void*)m_PresetItems[i]);
-
 			// Add the item
-			m_PresetName.addItem(m_Presets[i].GetName(), Variant);
+			m_PresetName.addItem(m_Presets[i].GetName());
 		}
 	}
 
@@ -170,7 +166,11 @@ public:
 		QFile XmlFile;
 
 		// File name + extension
-		QString FileName = QApplication::applicationDirPath() + "/" + m_InternalName + "Presets.xml";
+		
+		QSettings Settings;
+
+		QString folder = Settings.value("startup/preset/folder").toString();
+		QString FileName = folder + "/" + m_InternalName + "Presets.xml";
 
 		Log(QString("Loading " + m_UserInterfaceName.toLower() + " presets from file: "+ QFileInfo(FileName).fileName()).toAscii());
 

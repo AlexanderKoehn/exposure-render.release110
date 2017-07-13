@@ -19,16 +19,8 @@ SET(CMAKE_BUILD_TYPE "RelWithDebInfo")
 FIND_PACKAGE(CUDA)
 
 # Supported streaming architectures
-# SET(CUDA_NVCC_FLAGS "-gencode=arch=compute_10,code=sm_10;${CUDA_NVCC_FLAGS}")
-# SET(CUDA_NVCC_FLAGS "-gencode=arch=compute_10,code=compute_10;${CUDA_NVCC_FLAGS}")
-# SET(CUDA_NVCC_FLAGS "-gencode=arch=compute_11,code=sm_11;${CUDA_NVCC_FLAGS}")
-# SET(CUDA_NVCC_FLAGS "-gencode=arch=compute_11,code=compute_11;${CUDA_NVCC_FLAGS}")
-# SET(CUDA_NVCC_FLAGS "-gencode=arch=compute_12,code=sm_12;${CUDA_NVCC_FLAGS}")
-# SET(CUDA_NVCC_FLAGS "-gencode=arch=compute_12,code=compute_12;${CUDA_NVCC_FLAGS}")
-# SET(CUDA_NVCC_FLAGS "-gencode=arch=compute_13,code=sm_13;${CUDA_NVCC_FLAGS}")
-# SET(CUDA_NVCC_FLAGS "-gencode=arch=compute_13,code=compute_13;${CUDA_NVCC_FLAGS}")
-SET(CUDA_NVCC_FLAGS "-gencode=arch=compute_20,code=sm_20;${CUDA_NVCC_FLAGS}")
-SET(CUDA_NVCC_FLAGS "-gencode=arch=compute_20,code=compute_20;${CUDA_NVCC_FLAGS}")
+SET(CUDA_NVCC_FLAGS "-gencode=arch=compute_30,code=sm_30;${CUDA_NVCC_FLAGS}")
+SET(CUDA_NVCC_FLAGS "-gencode=arch=compute_30,code=compute_30;${CUDA_NVCC_FLAGS}")
 
 IF(NOT VTK_BINARY_DIR)
 FIND_PACKAGE(VTK)
@@ -158,8 +150,7 @@ SET(ExposureRenderSources
 	LogDockWidget.cpp
 )
 
-SET(ExposureRenderHeaders 
-	
+SET(ExposureRenderHeaders
 	# Main
 	MainWindow.h
 	LoadSettingsDialog.h
@@ -245,10 +236,13 @@ SET(ExposureRenderHeaders
 	Logger.h
 	LogWidget.h
 	LogDockWidget.h
+
+	# CUDA utility
+	helper_math.h
 )
 
 SET(ExposureRenderMocHeaders 
-	# Main
+	d
 	MainWindow.h
 	SettingsDockWidget.h
 	LoadSettingsDialog.h
@@ -320,16 +314,22 @@ SET(ExposureRenderResources Icons/Icons.qrc)
 MACRO (PCH_QT4_WRAP_CPP outfiles )
   # get include dirs
   QT4_GET_MOC_FLAGS(moc_flags)
+  
   QT4_EXTRACT_OPTIONS(moc_files moc_options ${ARGN})
  
+
   FOREACH (it ${moc_files})
-    
+
 	GET_FILENAME_COMPONENT(it ${it} ABSOLUTE)
     QT4_MAKE_OUTPUT_FILE(${it} moc_ cxx outfile)
     set (moc_flags_append "-fStable.h" "-f${it}") # StdAfx hack.
  
 	# message (STATUS "Moc Flags append ${moc_flags_append}")
-	QT4_CREATE_MOC_COMMAND(${it} ${outfile} "${moc_flags};${moc_flags_append}" "${moc_options}")
+    IF(CMAKE_VERSION VERSION_GREATER 2.8.11.20130607)
+      QT4_CREATE_MOC_COMMAND(${it} ${outfile} "${moc_flags};${moc_flags_append}" "${moc_options}" "")
+    ELSE(CMAKE_VERSION VERSION_GREATER 2.8.11.20130607)
+	  QT4_CREATE_MOC_COMMAND(${it} ${outfile} "${moc_flags};${moc_flags_append}" "${moc_options}")
+    ENDIF(CMAKE_VERSION VERSION_GREATER 2.8.11.20130607)
 	
 	SET(${outfiles} ${${outfiles}} ${outfile})
 
@@ -576,9 +576,9 @@ SET(LoggingSources
 	LogWidget.cpp
 	LogDockWidget.cpp
 )
-
 # Make the logging group
 SOURCE_GROUP("Logging" FILES ${LoggingSources})
+
 
 ADD_DEFINITIONS(-DQT_GUI_LIBS -DQT_CORE_LIB -DQT_XML_LIB -DQT3_SUPPORT)
 
@@ -610,15 +610,15 @@ if (MSVC)
 endif(MSVC)
 
 ### VTK dependencies ###
-FILE(GLOB VtkDlls "${VTK_DIR}/bin/RelWithDebInfo/*.dll")
+FILE(GLOB VtkDlls "${VTK_DIR}/bin/Debug/*.dll")
 INSTALL_FILES(/bin FILES ${VtkDlls})
 
 ### CUDA dependencies ###
-SET(CudaDlls ${CUDA_TOOLKIT_ROOT_DIR}/bin/cudart32_40_17.dll)
+SET(CudaDlls ${CUDA_TOOLKIT_ROOT_DIR}/bin/cudart32_80.dll)
 INSTALL_FILES(/bin FILES ${CudaDlls})
 
 ### QT dependencies ###
-SET(QtDlls ${QT_BINARY_DIR}/QtCore4.dll ${QT_BINARY_DIR}/QtGui4.dll ${QT_BINARY_DIR}/QtXml4.dll ${QT_BINARY_DIR}/QtSql4.dll ${QT_BINARY_DIR}/QtNetwork4.dll)
+SET(QtDlls ${QT_BINARY_DIR}/QtCored4.dll ${QT_BINARY_DIR}/QtGuid4.dll ${QT_BINARY_DIR}/QtXmld4.dll ${QT_BINARY_DIR}/QtSqld4.dll ${QT_BINARY_DIR}/QtNetworkd4.dll)
 INSTALL_FILES(/bin FILES ${QtDlls})
 
 ### Example .mhd and .raw files ###
